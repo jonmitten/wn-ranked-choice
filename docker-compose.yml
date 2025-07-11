@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: rcv-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - wn-rcv-network
+
+  backend:
+    build: ./backend
+    container_name: rcv-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://rcv_user:rcv_password@db:5432/rcv_db
+    depends_on:
+      - db
+    networks:
+      - wn-rcv-network
+
+  db:
+    image: postgres:15
+    container_name: rcv-db
+    restart: always
+    environment:
+      POSTGRES_USER: rcv_user
+      POSTGRES_PASSWORD: rcv_password
+      POSTGRES_DB: rcv_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - wn-rcv-network
+
+volumes:
+  postgres_data:
+
+networks:
+  wn-rcv-network:
+    driver: bridge
