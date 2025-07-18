@@ -1,11 +1,9 @@
-version: "3.9"
-
 services:
   frontend:
     build: ./frontend
     container_name: rcv-frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - REACT_APP_API_URL=http://backend:8000
     depends_on:
@@ -22,6 +20,8 @@ services:
       - DATABASE_URL=postgres://rcv_user:rcv_password@db:5432/rcv_db
     depends_on:
       - db
+    command: >
+      sh -c "python wait_for_db.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     networks:
       - wn-rcv-network
 
